@@ -22,13 +22,19 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        # Memastikan alat testing terinstall secara eksplisit
+        pip install flake8 nose coverage
+        # Cek apakah file requirements.txt ada sebelum menginstall
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Lint with flake8
       run: |
+        # Berhenti jika ada error logika (E9, F63, F7, F82)
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Menampilkan peringatan tapi tidak menghentikan build (exit-zero)
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
     - name: Run unit tests with nosetests
       run: |
-        nosetests
+        # Menjalankan tes dengan mode verbose agar log terlihat jelas
+        nosetests -v --with-spec --spec-color
